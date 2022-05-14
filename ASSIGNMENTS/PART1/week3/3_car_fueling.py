@@ -1,4 +1,5 @@
 #! /bin/python3 
+from itertools import count
 import sys
 
 # Input Format. The first line contains an integer 𝑑. The second line contains an integer 𝑚. The third line
@@ -14,31 +15,27 @@ import sys
 # stops = where stops are located
 
 def compute_min_refills(distance: int, tank: int, stops: list):
-    loop = len(stops)
-    index_count = 0
-    while loop:
-        if distance <= 0:
-            return 0
-        current_stop = stops[index_count]
-        entered_if = False
-        if tank < current_stop:
-            entered_if = True
-            previous_stop_index = index_count - 1
-            previous_stop_location = stops[previous_stop_index]
-            distance -= previous_stop_location
-            stops = [stop - stops[index_count - 1] for stop in stops[index_count:]]
-            
-        if not entered_if: index_count += 1
-        else:
-            entered_if = False
-            index_count = 0
-            loop = len(stops)
+    # se o valor da primeira parada for maior que o limite de combustivel, retorna -1
+    #if the value of the first stop is greater than the full tank limit, return -1
+    if tank < stops[0]: return -1
 
-    return 1
+    # se a distancia for menor que o limite de combustivel, retorna 0
+    # if the distance is less than the full tank limit, return 0
+    if distance <= tank: return 0
+
+    if stops[-1] != distance: stops.append(distance)
+
+    i = 0
+    while stops[i] <= tank: i += 1
+
+    distance -= stops[i - 1]
+    stops = [stop - stops[i - 1] for stop in stops[i:]]
+    
+    if compute_min_refills(distance, tank, stops) < 0: return -1
+
+    return 1 + compute_min_refills(distance, tank, stops)
 
 
-compute_min_refills(950, 400, [200, 375, 550, 750])
-
-# if __name__ == '__main__':
-#     d, m, _, *stops = map(int, sys.stdin.read().split())
-#     print(compute_min_refills(d, m, stops))
+if __name__ == '__main__':
+    d, m, _, *stops = map(int, sys.stdin.read().split())
+    print(compute_min_refills(d, m, stops))
