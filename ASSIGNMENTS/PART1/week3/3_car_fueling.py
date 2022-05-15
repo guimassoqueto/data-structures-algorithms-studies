@@ -10,32 +10,31 @@ import sys
 # minimum number of refills needed. Assume that the car starts with a full tank. If it is not possible to
 # reach the destination, output −1.
 
-# d = distance
-# m = max car's travel distance on full tank
-# stops = where stops are located
-
-def compute_min_refills(distance: int, tank: int, stops: list):
-    # se o valor da primeira parada for maior que o limite de combustivel, retorna -1
-    #if the value of the first stop is greater than the full tank limit, return -1
-    if tank < stops[0]: return -1
-
-    # se a distancia for menor que o limite de combustivel, retorna 0
-    # if the distance is less than the full tank limit, return 0
+# done
+def compute_min_refills(distance: int, tank: int, stops: list) -> int:
     if distance <= tank: return 0
 
-    if stops[-1] != distance: stops.append(distance)
+    refuels = 0
+    starting_point = 0
 
-    i = 0
-    while stops[i] <= tank: i += 1
+    for i in range(len(stops)):
+        has_stop = False
+        while stops[i] - starting_point <= tank:
+            if i == len(stops): break
+            has_stop = True
+            i += 1
+            
+            if has_stop:
+                starting_point = stops[i]
+                refuels += 1
+                if starting_point + tank >= distance:
+                    return refuels
+            else: 
+                return -1
 
-    distance -= stops[i - 1]
-    stops = [stop - stops[i - 1] for stop in stops[i:]]
-    
-    if compute_min_refills(distance, tank, stops) < 0: return -1
-
-    return 1 + compute_min_refills(distance, tank, stops)
-
+    return -1
 
 if __name__ == '__main__':
     d, m, _, *stops = map(int, sys.stdin.read().split())
     print(compute_min_refills(d, m, stops))
+# done
