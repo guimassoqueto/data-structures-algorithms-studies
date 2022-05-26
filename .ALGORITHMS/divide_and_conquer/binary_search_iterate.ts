@@ -6,6 +6,7 @@ function binary_search_iterate<T>(arr: Array<T>, low: number, high: number, key:
         else if (arr[mid] < key) high = mid - 1
         else low = mid + 1
     }
+    return -1
 }
 
 const arr: number[] = [175, 351, 897, 314, 97, 23, 987, 315, 1004, 897, 698]
