@@ -2,23 +2,27 @@
 import sys
 
 def get_optimal_value(n, capacity, weights, values) -> None:
-    if (not n) or (not capacity): return 0
+    if (n <= 0) or (capacity <= 0): return 0
+
+    ratio_vw = [(weights[i], values[i], values[i] / weights[i]) for i in range(len(weights))]
+    ratio_vw.sort(key = lambda tup: tup[2], reverse=True)
+
+    snappack_value = 0
+    remaining_items = []
+    for i in range(len(ratio_vw)):
+        w, v, r = ratio_vw[i]
+        if capacity >= w:
+            capacity -= w
+            snappack_value += v
+        else: remaining_items.append((w, v, r))
         
-    snapsack_value = 0
-    items = len(weights) - 1
+    del ratio_vw
 
-    if capacity and (capacity < weights[0]):
-        snapsack_value += n * (values[-1] / (weights[-1] / capacity))
-        n = 0
+    if capacity and len(remaining_items):
+        snappack_value += capacity / remaining_items[0][0] * remaining_items[0][1]
 
-    if n:
-        for i in range(items, -1, -1):
-            while (n and capacity) and capacity >= weights[i]:
-                capacity -= weights[i]
-                snapsack_value += values[i]
-                n -= 1
-    
-    return snapsack_value
+    return snappack_value
+
 
 if __name__ == "__main__":
     data = list(map(int, sys.stdin.read().split()))
