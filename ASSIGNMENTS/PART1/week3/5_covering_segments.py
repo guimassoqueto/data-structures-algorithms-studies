@@ -6,28 +6,44 @@ Segment = namedtuple('Segment', 'start end')
 
 def optimal_points(segments):
     number_of_segments = len(segments)
+    indexes = set([i for i in range(number_of_segments)])
+
     points = []
-    #write your code here
-    for s in segments: points += list(range(s.start, s.end + 1))
-    
-    result = []
-    _dict = {}
-    for i in points:
-        _dict.setdefault(i, 0)
-        _dict[i] += 1
+    for s in segments:
+        points.append(tuple(range(s.end, s.start -1, -1)))
 
-    max_count = max(_dict.values())
-    for k, v in _dict.items(): 
-        if v == max_count:
-            result.append(k) 
-    
-    print(points)
+    points.sort(key = lambda list: list[0], reverse = True)
+    for idx, _tuple in enumerate(points): points[idx] = set(_tuple) # optional
 
+    results = set()
+
+    dict_sets, nums_set = {}, set()
+    i = 0
+    while i < number_of_segments:
+        for num in points[i]:
+            if num in nums_set: continue
+            dict_sets.setdefault(num, {i})
+            
+            j = i + 1
+            while j < number_of_segments:
+                if num in points[j]:
+                    dict_sets[num].add(j)
+                    if dict_sets[num] == indexes: results.add(num)
+                j += 1
+            nums_set.add(num)
+        i += 1
+    del nums_set
+
+    if results: return results
+
+    print(max(indexes))
+
+    return set()
 
 if __name__ == '__main__':
     input = sys.stdin.read()
     n, *data = map(int, input.split())
     segments = list(map(lambda x: Segment(x[0], x[1]), zip(data[::2], data[1::2])))
     points = optimal_points(segments)
-    #print(len(points))
-    #print(*points)
+    print(len(points))
+    print(*points)
