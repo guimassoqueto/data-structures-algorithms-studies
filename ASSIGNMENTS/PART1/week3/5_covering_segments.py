@@ -5,45 +5,28 @@ from collections import namedtuple
 Segment = namedtuple('Segment', 'start end')
 
 def optimal_points(segments):
-    number_of_segments = len(segments)
-    indexes = set([i for i in range(number_of_segments)])
-
+    min_seg_val, max_seg_val = 1_000_000_001, -1_000_000_001
     points = []
     for s in segments:
-        points.append(tuple(range(s.end, s.start -1, -1)))
+        if s.start < min_seg_val: min_seg_val = s.start
+        if s.end > max_seg_val: max_seg_val = s.end
+        points.append((s.start, s.end))
 
-    points.sort(key = lambda list: list[0], reverse = True)
-    for idx, _tuple in enumerate(points): points[idx] = set(_tuple) # optional
+    points.sort(key = lambda tup: tup[1], reverse = True)
 
-    results = set()
-
-    dict_sets, nums_set = {}, set()
-    i = 0
-    while i < number_of_segments:
-        for num in points[i]:
-            if num in nums_set: continue
-            dict_sets.setdefault(num, {i})
-            
-            j = i + 1
-            while j < number_of_segments:
-                if num in points[j]:
-                    dict_sets[num].add(j)
-                    if dict_sets[num] == indexes: results.add(num)
-                j += 1
-            nums_set.add(num)
-        i += 1
-    del nums_set
-
-    if results: return results
-
-    print(max(indexes))
-
-    return set()
+    
+    for seg_val in range(min_seg_val, max_seg_val + 1):
+        j = 0
+        while j < len(points):
+            min_number, max_number = points[j]
+            if  min_number <= seg_val <= max_number: 
+                print(f'{seg_val} in {points[j]}')
+            j += 1
 
 if __name__ == '__main__':
     input = sys.stdin.read()
     n, *data = map(int, input.split())
     segments = list(map(lambda x: Segment(x[0], x[1]), zip(data[::2], data[1::2])))
     points = optimal_points(segments)
-    print(len(points))
-    print(*points)
+    #print(len(points))
+    #print(*points)
