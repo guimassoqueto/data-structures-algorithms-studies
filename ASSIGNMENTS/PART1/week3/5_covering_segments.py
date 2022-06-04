@@ -5,28 +5,33 @@ from collections import namedtuple
 Segment = namedtuple('Segment', 'start end')
 
 def optimal_points(segments):
-    min_seg_val, max_seg_val = 1_000_000_001, -1_000_000_001
-    points = []
+    listOfTuples = []
     for s in segments:
-        if s.start < min_seg_val: min_seg_val = s.start
-        if s.end > max_seg_val: max_seg_val = s.end
-        points.append((s.start, s.end))
+        listOfTuples.append((s.start, s.end))
 
-    points.sort(key = lambda tup: tup[1], reverse = True)
+    sortedBeg = sorted(listOfTuples, key=lambda x: x[0])
+    sortedEnd = sorted(listOfTuples, key=lambda x: x[1])
 
-    
-    for seg_val in range(min_seg_val, max_seg_val + 1):
-        j = 0
-        while j < len(points):
-            min_number, max_number = points[j]
-            if  min_number <= seg_val <= max_number: 
-                print(f'{seg_val} in {points[j]}')
-            j += 1
+    thrhold = sortedBeg[0][0] - 1
+
+    listOfPoints = []
+    length = len(sortedEnd) - 1
+    for i in range(length):
+        beg, end = sortedEnd[i]
+        if beg > thrhold:
+            listOfPoints.append(end)
+            thrhold = end
+
+    if listOfPoints[-1] < sortedEnd[-1][0]:
+        if sortedEnd:
+            listOfPoints.append(sortedEnd[-1][0])
+
+    return listOfPoints
 
 if __name__ == '__main__':
     input = sys.stdin.read()
     n, *data = map(int, input.split())
     segments = list(map(lambda x: Segment(x[0], x[1]), zip(data[::2], data[1::2])))
     points = optimal_points(segments)
-    #print(len(points))
-    #print(*points)
+    print(len(points))
+    print(*points)
